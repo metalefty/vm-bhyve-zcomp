@@ -1,0 +1,67 @@
+#!/usr/bin/env zsh
+
+# vim: ts=4 sw=4 expandtab
+#
+# Copyright (c) 2025, Koichiro Iwao (metalefty) <meta@FreeBSD.org>
+# SPDX-License-Identifier: BSD-2-Clause
+
+current_date=$(date +%Y%m%d)
+target_file=$(git rev-parse --show-toplevel)/_vm
+
+bump_version()
+{
+    current_ver=$(grep '^VM_BHYVE_ZCOMP_VER=' "${target_file}" | head -n 1 | cut -d'=' -f2)
+
+    if [ -z "$current_ver" ]; then
+        echo "ERROR: Cannot get the current version."
+        exit 1
+    fi
+
+    ver_date=$(echo "$current_ver" | cut -d'.' -f1)
+    ver_rel=$(echo "$current_ver" | cut -d'.' -f2)
+
+    if [ "$ver_date" != "$current_date" ]; then
+        new_ver="${current_date}.1"
+    else
+      # increment rel
+        new_rel=$((ver_subversion + 1))
+        new_ver="${ver_date}.${new_rel}"
+    fi
+
+    sed -i '' "s/^VM_BHYVE_ZCOMP_VER=.*$/VM_BHYVE_ZCOMP_VER=${new_ver}/" "$target_file"
+}
+
+git_tag()
+{
+    if [ -n "$(git status -s)" ]; then
+        echo "ERROR: Working tree is not clean."
+        exit 1
+    fi
+
+    tag_ver=v$(source $target_file; echo $VM_BHYVE_ZCOMP_VER)
+
+    if [ -z "$tag_ver" ]; then
+        echo "ERROR: Cannot get the current version"
+        exit 1
+    fi
+
+    git tag $tag_ver
+}
+
+usage()
+{
+    echo "Usage: $1 <bump_version|git_tag>"
+}
+
+case $1 in
+    bump_version)
+        bump_version
+        ;;
+    git_tag)
+        git_tag
+        ;;
+    *)
+        usage $0
+        ;;
+esac
+
