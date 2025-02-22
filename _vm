@@ -1,0 +1,245 @@
+#compdef vm
+
+# Copyright (c) 2025, Koichiro Iwao (metalefty) <meta@FreeBSD.org>
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# vim: ts=4 sw=4 expandtab
+
+_vm()
+{
+
+    case ${CURRENT} in
+        2)
+            __vm_subcommands
+            ;;
+        *)
+            case "${words[2]}" in
+                configure|rename|clone)
+                    [ "${CURRENT}" -le 3 ] && \
+                        _values vms $(___vm_list)
+                    ;;
+                info|start)
+                    _values vms $(___vm_list)
+                    ;;
+                stop)
+                    _values vms_running $(___vm_list_running)
+                    ;;
+                console)
+                    [ "${CURRENT}" -le 3 ] && \
+                        _values vms_running $(___vm_list_running)
+                    [ "${CURRENT}" -le 4 ] && \
+                        _values comports com1 com2
+                    ;;
+                destroy)
+                    [ "${CURRENT}" -le 3 ] && \
+                        _values vms $(___vm_list)
+                    ;;
+                reset|poweroff)
+                    [ "${CURRENT}" -le 3 ] && \
+                        _values vms_running $(___vm_list_running)
+                    ;;
+                list)
+                    _arguments \
+                        '-r[show running VMs only]: :' \
+                        1:
+                    ;;
+                create)
+                    _arguments \
+                        "-t[template]:files:___vm_templates" \
+                        '-s[disk size]: : ' \
+                        '-c[CPU cores]: : ' \
+                        '-m[memory size]: : ' \
+                        '-i[VM disk image]: :->img' \
+                        '-C[enable cloud-init]: :' \
+                        '-k[path to ssh public key]: :' \
+                        '-n[network config]' \
+                        '1:name'
+
+                    case "${state}" in
+                        img)
+                            _values "${state}" $(___vm_imgs)
+                            ;;
+					esac
+                    ;;
+                install)
+                    [ "${CURRENT}" -eq 3 ] && \
+                        _values vms $(___vm_list)
+                    [ "${CURRENT}" -eq 4 ] && \
+                        _values isos $(___vm_isos)
+                    ;;
+                add)
+                    # no completion yet
+                    ;;
+                switch)
+                    case "${CURRENT}" in
+                        3)
+                            __vm_switch_subcommands
+                            ;;
+
+                        *)
+                            case ${words[3]} in # switch subcommand
+                                create)
+                                    # TODO
+                                    ;;
+                                add)
+                                    [ "${CURRENT}" -eq 4 ] && \
+                                        _values switches $(___vm_switch_list)
+                                    [ "${CURRENT}" -eq 5 ] && \
+                                        _values ifaces $(ifconfig -l)
+                                    ;;
+                                remove)
+                                    [ "${CURRENT}" -eq 4 ] && \
+                                        _values switches $(___vm_switch_list)
+                                    ;;
+                                info)
+                                    _values switches $(___vm_switch_list)
+                                    ;;
+                                address)
+                                    [ "${CURRENT}" -eq 4 ] && \
+                                        _values switches $(___vm_switch_list)
+                                    ;;
+                                vlan|remove|destroy)
+                                    [ "${CURRENT}" -eq 4 ] && \
+                                        _values switches $(___vm_switch_list)
+                                    ;;
+                                private|nat)
+                                    [ "${CURRENT}" -eq 4 ] && \
+                                        _values switches $(___vm_switch_list)
+                                    [ "${CURRENT}" -eq 5 ] && \
+                                        _values options on off
+                                    ;;
+                                list)
+                                    # no completion yet
+                                    ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                datastore)
+                    # no completion yet
+                    ;;
+                set|get)
+                    # no completion yet
+                    ;;
+                image)
+                    # no completion yet
+                    ;;
+                snapshot|rollback)
+                    # no copmletion yet
+                    ;;
+                img|iso|version|init|startall|stopall|passthru|list)
+                    # no completion needed
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+__vm_subcommands()
+{
+    local -a subcommands
+    subcommands=(
+         add:'add a new network or disk device to the virtual machine' \
+         clone:'create a clone of the virtual machine' \
+         configure:'open the virtual machine config in editor' \
+         console:'connect to the console of the virtual machine' \
+         create:'create a new virtual machine' \
+         datastore:'manage datastores' \
+         destroy:'destroy the virtual machine from the system' \
+         get:'get global configuration setting' \
+         image:'manage virtual machine images' \
+         img:'list all cloud-init images or download a cloud-init image' \
+         info:'show detailed information about virtual machine(s)' \
+         init:'setup the system to get ready to run vm-bhyve'\
+         install:'start the virtual machine with the ISO inserted' \
+         iso:'list all ISO images or download a ISO image' \
+         list:'list all virtual machines' \
+         passthru:'list all PCI devices in the system' \
+         poweroff:'forcefully poweroff the virtual machine' \
+         reset:'forcefully reset the virtual machine' \
+         restart:'attempt to restart the virtual machine' \
+         rollback:'rollback the virtual machine to the specified snapshot' \
+         set:'set the value of a global configuration setting' \
+         snapshot:'create a snapshot of the virtual machine' \
+         start:'start the virtual machine(s)' \
+         startall:'start all virtual machines configured for auto-start' \
+         stop:'stop the virtual machine(s)' \
+         stopall:'stop all running virtual machines' \
+         switch:'manage virtual network switches' \
+         version:'show version')
+    _describe -t commands "subcommands" subcommands
+}
+
+__vm_switch_subcommands()
+{
+    local -a subcommands
+    subcommands=(
+        add:'add a new virtual switch' \
+        list:'list virtual switches' \
+        info:'show detailed information about virtual switch(es)' \
+        create:'create a new virtual switch' \
+        vlan:'assign a VLAN to the virtual switch' \
+        address:'configure IP address for the virtual switch' \
+        private:'enable or disable private mode for the virtual switch'  \
+        remove:'remove the interface from the virtual switch'\
+        destroy:'destroy the virtual switch' \
+        )
+    _describe -t commands "subcommands" subcommands
+}
+
+#
+# Helper functions
+#
+
+___vm_dir()
+{
+    local _vm_dir
+    _vm_dir=$(sysrc -iqn vm_dir)
+
+    case "${_vm_dir}" in
+        zfs:*)
+            _vm_dir=$(zfs get -H -o value mountpoint "${_vm_dir//zfs:/}")
+            ;;
+    esac
+
+    echo ${_vm_dir}
+}
+
+___vm_list()
+{
+    vm list | tail +2 | awk '{print $1}'
+}
+
+
+___vm_list_running()
+{
+    vm list -r | tail +2 | awk '{print $1}'
+}
+
+___vm_switch_list()
+{
+    vm switch list | tail +2 | awk '{print $1}'
+}
+
+___vm_imgs()
+{
+    vm img | tail +2  | awk '{print $2}'
+}
+
+___vm_isos()
+{
+    vm iso | tail +2 | awk '{print $2}'
+}
+
+___vm_templates()
+{
+    local -a _templates
+    _templates=($(___vm_dir)/.templates/*.conf)
+
+    for i in {1..${#_templates[@]}}; do
+        _templates[$i]=$(basename ${_templates[$i]} .conf)
+    done
+
+    _values templates $_templates[@]
+}
+
