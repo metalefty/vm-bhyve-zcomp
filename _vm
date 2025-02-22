@@ -5,6 +5,8 @@
 #
 # vim: ts=4 sw=4 expandtab
 
+VM_BHYVE_ZCOMP_VER=20250222.1
+
 _vm()
 {
 
