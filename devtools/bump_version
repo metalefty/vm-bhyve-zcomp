@@ -24,7 +24,7 @@ bump_version()
         new_ver="${current_date}.1"
     else
       # increment rel
-        new_rel=$((ver_subversion + 1))
+        new_rel=$((ver_rel + 1))
         new_ver="${ver_date}.${new_rel}"
     fi
 
