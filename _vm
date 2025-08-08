@@ -188,6 +188,16 @@ __vm_switch_subcommands()
 }
 
 #
+# Completion functions
+#
+__comp_vm_list_with_highlight()
+{
+    local -a vms=($(___vm_list))
+    local -a descriptions=($(___vm_list_highlight_running))
+    compadd -X "* : running VMs" -d descriptions -a vms
+}
+
+#
 # Helper functions
 #
 
@@ -214,6 +224,13 @@ ___vm_list()
 ___vm_list_running()
 {
     vm list -r | tail +2 | awk '{print $1}'
+}
+
+# all vm list, running vms are highlighted
+___vm_list_highlight_running()
+{
+    vm list | tail +2 | \
+    awk '{print $1 (index($0, "Running") > 1 ? "*" : "")}'
 }
 
 ___vm_switch_list()
