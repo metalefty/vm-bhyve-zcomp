@@ -59,7 +59,7 @@ _vm()
                         img)
                             _values "${state}" $(___vm_imgs)
                             ;;
-					esac
+                    esac
                     ;;
                 install)
                     [ "${CURRENT}" -eq 3 ] && \
