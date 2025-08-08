@@ -2,8 +2,6 @@
 
 # Copyright (c) 2025, Koichiro Iwao (metalefty) <meta@FreeBSD.org>
 # SPDX-License-Identifier: BSD-2-Clause
-#
-# vim: ts=4 sw=4 expandtab
 
 VM_BHYVE_ZCOMP_VER=20250225.1
 
@@ -245,3 +243,4 @@ ___vm_templates()
     _values templates $_templates[@]
 }
 
+# vim: ts=4 sw=4 expandtab
