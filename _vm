@@ -25,10 +25,19 @@ _vm()
                     _values vms_running $(___vm_list_running)
                     ;;
                 console)
-                    [ "${CURRENT}" -le 3 ] && \
-                        _values vms_running $(___vm_list_running)
-                    [ "${CURRENT}" -le 4 ] && \
-                        _values comports com1 com2
+                    local -a opts=('-w:wait for VM start')
+
+                    if [ x"${words[3]}" = x"-w" ]; then
+                        [ "${CURRENT}" -le 4 ] && \
+                            _values vms $(___vm_list)
+                        [ "${CURRENT}" -eq 5 ] && \
+                            _values comports com1 com2
+                    else
+                        if [ "${CURRENT}" -le 3 ]; then
+                            _describe 'options' opts
+                            _values vms $(___vm_list)
+                        fi
+                    fi
                     ;;
                 destroy)
                     [ "${CURRENT}" -le 3 ] && \
