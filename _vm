@@ -78,10 +78,19 @@ _vm()
                     esac
                     ;;
                 install)
-                    [ "${CURRENT}" -eq 3 ] && \
-                        _values vms $(___vm_list)
-                    [ "${CURRENT}" -eq 4 ] && \
-                        _values isos $(___vm_isos)
+                    if [ x"${words[3]}" = x"-f" -o x"${words[3]}" = x"-i" ]; then
+                        [ "${CURRENT}" -eq 4 ] && \
+                            _values vms $(___vm_list)
+                        [ "${CURRENT}" -eq 5 ] && \
+                            _values isos $(___vm_isos)
+                    elif [ "${CURRENT}" -eq 3 ]; then \
+                            local -a opts=('-f:start VM in foreground' \
+                                           '-i:start VM in interactive mode')
+                            _describe options opts
+                            _values vms $(___vm_list)
+                    elif [ "${CURRENT}" -eq 4 ]; then
+                            _values isos $(___vm_isos)
+                    fi
                     ;;
                 add)
                     # no completion yet
