@@ -18,7 +18,13 @@ _vm()
                     [ "${CURRENT}" -le 3 ] && \
                         _values vms $(___vm_list)
                     ;;
-                info|start)
+                info)
+                    _values vms $(___vm_list)
+                    ;;
+                start)
+                    local -a opts=('-f:start VM in foreground' \
+                                   '-i:start VM in interactive mode')
+                    _describe options opts
                     _values vms $(___vm_list)
                     ;;
                 stop)
