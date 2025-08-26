@@ -50,6 +50,7 @@ _vm()
                 list)
                     _arguments \
                         '-r[show running VMs only]: :' \
+                        '-v[verbose]: :' \
                         1:
                     ;;
                 create)
@@ -136,7 +137,7 @@ _vm()
                 snapshot|rollback)
                     # no copmletion yet
                     ;;
-                img|iso|version|init|startall|stopall|passthru|list)
+                img|iso|version|init|startall|stopall|passthru)
                     # no completion needed
                     ;;
             esac
