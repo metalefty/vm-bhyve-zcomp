@@ -3,7 +3,7 @@
 # Copyright (c) 2025, Koichiro Iwao (metalefty) <meta@FreeBSD.org>
 # SPDX-License-Identifier: BSD-2-Clause
 
-VM_BHYVE_ZCOMP_VER=20250225.1
+VM_BHYVE_ZCOMP_VER=20260213.1
 
 _vm()
 {
