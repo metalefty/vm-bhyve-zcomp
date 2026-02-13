@@ -14,7 +14,7 @@ _vm()
             ;;
         *)
             case "${words[2]}" in
-                configure|rename|clone)
+                configure|edit|rename|clone)
                     [ "${CURRENT}" -le 3 ] && \
                         _values vms $(___vm_list)
                     ;;
@@ -27,7 +27,7 @@ _vm()
                     _describe options opts
                     _values vms $(___vm_list)
                     ;;
-                stop)
+                stop|suspend)
                     _values vms_running $(___vm_list_running)
                     ;;
                 console)
@@ -152,7 +152,7 @@ _vm()
                 snapshot|rollback)
                     # no copmletion yet
                     ;;
-                img|iso|version|init|startall|stopall|passthru)
+                img|iso|version|init|startall|stopall|suspendall|passthru)
                     # no completion needed
                     ;;
             esac
@@ -167,10 +167,12 @@ __vm_subcommands()
          add:'add a new network or disk device to the virtual machine' \
          clone:'create a clone of the virtual machine' \
          configure:'open the virtual machine config in editor' \
+         edit:'open the virtual machine config in editor' \
          console:'connect to the console of the virtual machine' \
          create:'create a new virtual machine' \
          datastore:'manage datastores' \
          destroy:'destroy the virtual machine from the system' \
+         discard:'discard the saved state of suspended virtual machine' \
          get:'get global configuration setting' \
          image:'manage virtual machine images' \
          img:'list all cloud-init images or download a cloud-init image' \
@@ -190,6 +192,8 @@ __vm_subcommands()
          startall:'start all virtual machines configured for auto-start' \
          stop:'stop the virtual machine(s)' \
          stopall:'stop all running virtual machines' \
+         suspend:'suspend the virtual machine(s)' \
+         suspendall:'suspend all running virtual machines' \
          switch:'manage virtual network switches' \
          version:'show version')
     _describe -t commands "subcommands" subcommands
