@@ -33,6 +33,7 @@ If you are a non-root user and run the `vm` command via `sudo`, apply the follow
 There might be better ways to do this, but this approach works well.
 
 1. Configure sudo to allow running the `vm` command without a password
+    - [Using SSH agent for sudo authentication](https://mwl.io/archives/1106) for example
 2. Add the following shell-function in your `.zshrc`
 
 ```sh
