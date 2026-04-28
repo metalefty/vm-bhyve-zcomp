@@ -26,3 +26,18 @@ autoload -Uz compinit && compinit
 ```
 
 Run `exec zsh` to reload.
+
+## Integration with sudo
+
+If you are a non-root user and run the `vm` command via `sudo`, apply the following settings to ensure that completion works properly.
+There might be better ways to do this, but this approach works well.
+
+1. Configure sudo to allow running the `vm` command without a password
+2. Add the following shell-function in your `.zshrc`
+
+```sh
+vm()
+{
+    \sudo vm $@
+}
+```
